@@ -20,12 +20,11 @@ OUT = ROOT / 'output/pdf/Lab_6_Bike_Share_Coverage_Report.pdf'
 TMP = ROOT / 'tmp/pdfs'
 OUT.parent.mkdir(parents=True, exist_ok=True)
 TMP.mkdir(parents=True, exist_ok=True)
-NAVY = HexColor('#163447')
-TEAL = HexColor('#007f76')
-GRAY = HexColor('#536372')
-LIGHT = HexColor('#edf4f6')
+BLACK = HexColor('#000000')
+GRAY = HexColor('#444444')
+LIGHT = HexColor('#eeeeee')
 STYLE = ParagraphStyle('body', fontName='Helvetica', fontSize=10.3,
-                       leading=15.4, textColor=NAVY)
+                       leading=15.4, textColor=BLACK)
 SMALL = ParagraphStyle('small', parent=STYLE, fontSize=8.8, leading=12.5)
 c = canvas.Canvas(str(TMP/'report_body.pdf'), pagesize=A4)
 c.setTitle('Lab 6 - Bike Share Rental: Code and Branch Coverage')
@@ -41,18 +40,18 @@ def start(title, sub='', wide=False):
     page += 1
     W, H = landscape(A4) if wide else A4
     c.setPageSize((W,H))
-    c.setFillColor(TEAL)
+    c.setFillColor(BLACK)
     c.rect(0,H-10,W,10,fill=1,stroke=0)
     c.setFillColor(GRAY)
     c.setFont('Helvetica',8)
     c.drawString(42,H-33,'SOFTWARE TESTING  /  LAB 6  /  BIKE SHARE RENTAL')
-    c.setFillColor(NAVY)
+    c.setFillColor(BLACK)
     c.setFont('Helvetica-Bold',21 if not wide else 19)
     c.drawString(42,H-68,title)
     Y=H-89
     if sub:
         p(sub,small=True)
-    c.setStrokeColor(HexColor('#d3dfe4'))
+    c.setStrokeColor(HexColor('#cccccc'))
     c.line(42,37,W-42,37)
     c.setFillColor(GRAY)
     c.setFont('Helvetica',8)
@@ -70,7 +69,7 @@ def p(text, small=False, after=9):
 def h(text):
     global Y
     Y-=5
-    c.setFillColor(TEAL)
+    c.setFillColor(BLACK)
     c.setFont('Helvetica-Bold',12)
     c.drawString(42,Y-12,text)
     Y-=25
@@ -85,7 +84,7 @@ def table(rows,widths):
         ('BOTTOMPADDING',(0,0),(-1,-1),8),
         ('TOPPADDING',(0,0),(-1,-1),8),
         ('LEFTPADDING',(0,0),(-1,-1),8),
-        ('LINEBELOW',(0,0),(-1,-1),0.4,HexColor('#d7e2e7')),
+        ('LINEBELOW',(0,0),(-1,-1),0.4,HexColor('#dddddd')),
     ]))
     _,height=t.wrap(W-84,1000)
     assert Y-height>45,(page,Y,height)
@@ -109,13 +108,13 @@ def code_file(filename, first=1, last=None, title=None):
         assert Y-leading>45,(filename,n,Y)
         c.setFillColor(GRAY);c.setFont('Courier',7)
         c.drawRightString(63,Y-8,str(n))
-        c.setFillColor(NAVY);c.setFont('Courier',size)
+        c.setFillColor(BLACK);c.setFont('Courier',size)
         c.drawString(74,Y-8,line)
         Y-=leading
 
 def screenshot(name, bottom=None, width=None, crop=None):
     global Y
-    im=Image.open(LAB/'evidence'/name)
+    im=Image.open(LAB/'evidence'/name).convert('L')
     if crop:
         im=im.crop(crop)
     elif bottom:
@@ -223,12 +222,12 @@ p('Both are local repository commits. The line commit includes the maintained '
 h('Evidence included in this single PDF')
 p('The next two landscape pages contain the genuine Terminal screenshots '
   'provided by the student after running the line and branch coverage commands. '
-  'Each page preserves the complete supplied screenshot and includes an enlarged '
+  'Each page reproduces the complete supplied screenshot in grayscale and includes an enlarged '
   'detail of its results table for readability. Only final results above 90% '
   'are shown as screenshots.')
 p('The appendices reproduce the complete application, both named test files and '
   'the default pytest entry point. Embedded PDF attachments preserve the runnable '
-  'Python files, requirements, README, original Terminal screenshots, saved '
+  'Python files, requirements, README, grayscale Terminal screenshots, saved '
   'runner stdout, JSON coverage data and the '
   'two-commit history. A PDF reader with attachment support can extract them.')
 p('Source reference: Lab_6_Code&amp;BranchCoverage_Student_Handout.docx (1).pdf, '
@@ -237,7 +236,7 @@ p('Source reference: Lab_6_Code&amp;BranchCoverage_Student_Handout.docx (1).pdf,
 
 start('Evidence 1 / Final line coverage',
       '17 passed. All 40 executable statements covered; no missing lines. '
-      'Genuine Terminal screenshot supplied by the student.',wide=True)
+      'Genuine Terminal screenshot supplied by the student, reproduced in grayscale.',wide=True)
 screenshot('line_coverage.png')
 h('Enlarged coverage table from the same screenshot')
 screenshot('line_coverage.png',width=690,crop=(0,132,1100,274))
@@ -247,7 +246,7 @@ p('Line coverage = 40 / 40 x 100 = 100.00%. '
 
 start('Evidence 2 / Final branch coverage',
       '57 passed. 40/40 statements and 30/30 measured branch outcomes covered. '
-      'Genuine Terminal screenshot supplied by the student.',wide=True)
+      'Genuine Terminal screenshot supplied by the student, reproduced in grayscale.',wide=True)
 screenshot('branch_coverage.png')
 h('Enlarged coverage table from the same screenshot')
 screenshot('branch_coverage.png',width=690,crop=(0,132,1100,274))
@@ -267,7 +266,7 @@ code_file('BranchCoverageTest_53_bike_share_rental.py',47,88,
           title='Appendix C / Branch tests, part 2')
 h('Default pytest entry point: test_bike_share_rental.py')
 for line in (LAB/'test_bike_share_rental.py').read_text().splitlines():
-    c.setFillColor(NAVY);c.setFont('Courier',8.05)
+    c.setFillColor(BLACK);c.setFont('Courier',8.05)
     c.drawString(42,Y-8,line);Y-=10
 p('Use one entry point per run. The default filename supports normal pytest '
   'discovery; explicitly collecting it together with the named deliverables '
@@ -291,7 +290,13 @@ attachments=[
  'evidence/line_coverage.png','evidence/branch_coverage.png',
 ]
 for item in attachments:
-    writer.add_attachment(item.replace('/','__'),(LAB/item).read_bytes())
+    if item in ('evidence/line_coverage.png','evidence/branch_coverage.png'):
+        buffer=BytesIO()
+        Image.open(LAB/item).convert('L').save(buffer,format='PNG')
+        data=buffer.getvalue()
+    else:
+        data=(LAB/item).read_bytes()
+    writer.add_attachment(item.replace('/','__'),data)
 with OUT.open('wb') as stream:
     writer.write(stream)
 print(f'{OUT}\nPages: {page}\nSize: {OUT.stat().st_size:,} bytes')

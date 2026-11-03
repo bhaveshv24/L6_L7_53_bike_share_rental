@@ -51,8 +51,9 @@ the application source is unchanged and nothing is excluded from coverage.
 
 The line and branch PNGs preserve the genuine Terminal screenshots supplied by
 the student, unchanged. These replace the earlier browser-rendered command
-output images. The PDF includes only the two genuine Terminal screenshots,
-with enlarged details of their results tables. Earlier HTML summary screenshots
+output images. The PDF uses black and white throughout, including grayscale
+copies of the two genuine Terminal screenshots and enlarged coverage tables.
+The source PNGs retain the student's original colors. Earlier HTML summary screenshots
 remain as supplemental repository evidence. Runner transcripts and JSON data
 are retained alongside the images; their timing values reflect the earlier
 recorded runs. The `COVERAGE_FILE` variable is set by the runner to preserve
