@@ -113,10 +113,13 @@ def code_file(filename, first=1, last=None, title=None):
         c.drawString(74,Y-8,line)
         Y-=leading
 
-def screenshot(name, bottom, width=None):
+def screenshot(name, bottom=None, width=None, crop=None):
     global Y
     im=Image.open(LAB/'evidence'/name)
-    im=im.crop((0,0,im.width,bottom))
+    if crop:
+        im=im.crop(crop)
+    elif bottom:
+        im=im.crop((0,0,im.width,bottom))
     draw_w=width or W-84
     draw_h=draw_w*im.height/im.width
     assert Y-draw_h>45,(page,Y,draw_h)
@@ -218,14 +221,15 @@ p('Both are local repository commits. The line commit includes the maintained '
   'line test file and screenshot; the branch commit includes the maintained '
   'branch test file and screenshot. Existing application code is preserved.')
 h('Evidence included in this single PDF')
-p('The next three landscape pages contain four actual browser captures: final '
-  'line command output, final branch command output, the generated file summary, '
-  'and the generated function summary. The command-output screenshots display '
-  'verbatim saved execution output in a browser; they are not native Terminal '
-  'window captures. Only final results above 90% are shown as screenshots.')
+p('The next two landscape pages contain the genuine Terminal screenshots '
+  'provided by the student after running the line and branch coverage commands. '
+  'Each page preserves the complete supplied screenshot and includes an enlarged '
+  'detail of its results table for readability. Only final results above 90% '
+  'are shown as screenshots.')
 p('The appendices reproduce the complete application, both named test files and '
   'the default pytest entry point. Embedded PDF attachments preserve the runnable '
-  'Python files, requirements, README, exact stdout, JSON coverage data and the '
+  'Python files, requirements, README, original Terminal screenshots, saved '
+  'runner stdout, JSON coverage data and the '
   'two-commit history. A PDF reader with attachment support can extract them.')
 p('Source reference: Lab_6_Code&amp;BranchCoverage_Student_Handout.docx (1).pdf, '
   'especially the steps and deliverables on pages 3-4. Repository evidence and '
@@ -233,24 +237,23 @@ p('Source reference: Lab_6_Code&amp;BranchCoverage_Student_Handout.docx (1).pdf,
 
 start('Evidence 1 / Final line coverage',
       '17 passed. All 40 executable statements covered; no missing lines. '
-      'Actual browser screenshot of the saved command output; unused lower screen area cropped.',wide=True)
-screenshot('line_coverage.png',1360)
+      'Genuine Terminal screenshot supplied by the student.',wide=True)
+screenshot('line_coverage.png')
+h('Enlarged coverage table from the same screenshot')
+screenshot('line_coverage.png',width=690,crop=(0,132,1100,274))
 p('Line coverage = 40 / 40 x 100 = 100.00%. '
-  'The coverage report measures bike_share_rental.py only.',small=True)
+  'The report records 40 statements, 0 missed statements and 100% coverage. '
+  'The screenshot shows 17 passed in 0.02 seconds.',small=True)
 
 start('Evidence 2 / Final branch coverage',
       '57 passed. 40/40 statements and 30/30 measured branch outcomes covered. '
-      'Actual browser screenshot of saved command output; unused lower screen area cropped.',wide=True)
-screenshot('branch_coverage.png',1430)
+      'Genuine Terminal screenshot supplied by the student.',wide=True)
+screenshot('branch_coverage.png')
+h('Enlarged coverage table from the same screenshot')
+screenshot('branch_coverage.png',width=690,crop=(0,132,1100,274))
 p('BrPart = 0 and Missing is empty. The explicit branch ratio is 30 / 30 = 100.00%; '
-  'the combined Cover result is also 100%.',small=True)
-
-start('Evidence 3 / Generated HTML reports',
-      'Actual screenshots of coverage.py output. Lower blank screen areas cropped for readability.',wide=True)
-screenshot('coverage_html_summary.png',790,width=660)
-screenshot('coverage_functions.png',960,width=660)
-p('The file summary reports separate statement and branch percentages. The function '
-  'summary confirms execution of ride_cost, dock_status and can_unlock.',small=True)
+  'the combined Cover result is also 100%. The screenshot shows 57 passed in '
+  '0.04 seconds.',small=True)
 
 code_file('bike_share_rental.py',title='Appendix A / Application under test')
 p('Application source is byte-for-byte identical to the original repository version '
@@ -285,6 +288,7 @@ attachments=[
  'evidence/baseline/line.txt','evidence/baseline/branch.txt',
  'evidence/baseline/line.json','evidence/baseline/branch.json',
  'evidence/implementation_commits.txt',
+ 'evidence/line_coverage.png','evidence/branch_coverage.png',
 ]
 for item in attachments:
     writer.add_attachment(item.replace('/','__'),(LAB/item).read_bytes())
