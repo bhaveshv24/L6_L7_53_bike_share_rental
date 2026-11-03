@@ -17,9 +17,8 @@ def run_stage(stage):
     evidence = lab / "evidence"
     evidence.mkdir(exist_ok=True)
     branch = stage == "branch"
-    tests = ["CodeCoverageTest_53_bike_share_rental.py"]
-    if branch:
-        tests.append("BranchCoverageTest_53_bike_share_rental.py")
+    tests = ["BranchCoverageTest_53_bike_share_rental.py" if branch
+             else "CodeCoverageTest_53_bike_share_rental.py"]
     env = dict(os.environ, COVERAGE_FILE=str(evidence / f".coverage.{stage}"))
     commands = [
         ["--version"],
@@ -56,20 +55,29 @@ def run_stage(stage):
             f"{100 * totals['covered_branches'] / totals['num_branches']:.2f}%")
     text = "\n".join(transcript) + "\n"
     (evidence / f"{stage}_terminal.txt").write_text(text)
-    # Verbatim captured stdout, displayed locally for an actual browser screenshot.
+    write_transcript_view(evidence, stage, text)
+    print(text)
+
+
+def write_transcript_view(evidence, stage, text):
+    # Show the result commands verbatim; the full transcript is kept beside it.
+    start = text.index("$ python -m coverage run")
+    end = text.index("$ python -m coverage json")
+    summary = text[text.index("Line coverage:"):]
+    display = text.splitlines()[0] + "\n\n" + text[start:end] + summary
     (evidence / f"{stage}_terminal.html").write_text(
         '<!doctype html><meta charset="utf-8">'
         f'<title>Lab 6 - {stage} coverage command output</title>'
         '<style>body{margin:0;background:#101923;color:#e8eef5;padding:28px;}'
         'h1{font:600 22px system-ui;margin:0 0 8px;color:#8fe4c0;}'
         'p{font:14px system-ui;color:#bac9d8;margin:0 0 22px;}'
-        'pre{font:15px/1.55 Menlo,monospace;white-space:pre-wrap;'
+        'pre{font:18px/1.55 Menlo,monospace;white-space:pre-wrap;'
         'overflow-wrap:anywhere;margin:0}</style>'
         f'<h1>Lab 6 / {stage.title()} coverage</h1>'
         '<p>Verbatim command output saved by run_coverage.py. '
         'Browser view of the execution transcript.</p>'
-        f'<pre>{escape(text)}</pre>')
-    print(text)
+        f'<pre>{escape(display)}</pre>'
+        f'<p style="margin-top:24px">Full transcript: {stage}_terminal.txt</p>')
 
 
 if __name__ == "__main__":
